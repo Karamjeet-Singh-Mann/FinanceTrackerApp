@@ -1,84 +1,102 @@
 Finance Tracker 💰
+
 An AI-powered personal finance tracking iOS application built with modern iOS architecture and scalable engineering practices.
+
 🚀 Features
+
 📊 Expense Dashboard & Analytics
+
 ➕ Add / Delete Transactions
+
 🔍 Search & Filter Transactions
+
 💾 Offline-first Persistence
+
 🤖 AI-powered Expense Categorization
+
 🌙 Dark Mode Support
+
 📈 Charts & Spending Insights
+
 ⚡ Async/Await Networking
+
 🧪 Unit Testable Architecture
+
 🧱 Architecture
+
 The app follows a scalable and modular architecture:
+
 MVVM + Coordinator Pattern
+
 Dependency Injection
+
 Feature-based folder structure
+
 Service abstraction
+
 Protocol-oriented design
+
 📁 Project Structure
+
 FinanceTracker/
-│
-├── App/
-│   ├── FinanceTrackerApp.swift
-│   ├── AppCoordinator.swift
-│   ├── AppCoordinatorView.swift
-│   └── DIContainer.swift
-│
-├── Core/
-│   ├── Networking/
-│   ├── Persistence/
-│   ├── Utilities/
-│   ├── Extensions/
-│   └── DesignSystem/
-│
-├── Features/
-│   ├── Dashboard/
-│   ├── Transactions/
-│   ├── AddExpense/
-│   └── Analytics/
-│
-├── Services/
-│   ├── APIService/
-│   ├── PersistenceService/
-│   └── AIService/
-│
-├── Resources/
-│
-└── Tests/
-    ├── UnitTests/
-    └── UITests/
-    
+
+
 🧠 Tech Stack
 UI
+
   SwiftUI
+  
   Architecture
+  
   MVVM-C (MVVM + Coordinator)
+  
   Networking
+  
   URLSession
+  
   Async/Await
+  
 Persistence
+
   Core Data
+  
 Reactive Programming
+
   Combine
+  
 Testing
+
   XCTest
+  
 CI/CD
+
   GitHub Actions
+  
 📡 Networking Layer
+
   The networking layer is fully generic and reusable.
+  
   Features:
+  
   Endpoint abstraction
+  
+  
   Request builder
+  
   Typed decoding
+  
   Centralized error handling
+  
   Async/await support
+  
   Example:
+  
   let endpoint = Endpoint(path: "/products")
 
   let response: ProductsResponse =
+
       try await apiClient.request(endpoint)
+
 💾 Persistence Strategy
   The application follows an offline-first approach.
   Local caching using Core Data
