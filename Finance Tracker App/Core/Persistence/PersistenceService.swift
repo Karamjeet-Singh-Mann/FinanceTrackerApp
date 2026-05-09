@@ -8,6 +8,14 @@
 import Foundation
 
 protocol PersistenceService {
-    func save<T: Codable>(_ object: T, forKey key: String)
-    func fetch<T: Codable>(_ type: T.Type, forKey key: String) -> T?
+    
+    func saveTransaction(
+        title: String,
+        amount: Double,
+        category: String
+    ) throws
+    
+    func fetchTransactions() throws -> [Transaction]
+    
+    func deleteTransaction(_ transaction: Transaction) throws
 }

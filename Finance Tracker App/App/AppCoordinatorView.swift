@@ -15,8 +15,8 @@ struct AppCoordinatorView: View {
     
     var body: some View {
         NavigationStack(path: $coordinator.path) {
-           DashboardView(container: container)
-       }
+            DashboardView(container: container)
+        }
     }
 }
 

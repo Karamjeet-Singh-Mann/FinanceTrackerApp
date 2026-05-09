@@ -20,6 +20,7 @@ struct FinanceTrackerApp: App {
                 coordinator: coordinator,
                 container: container
             )
-        }
+        }.modelContainer(for: Transaction.self)
+
     }
 }

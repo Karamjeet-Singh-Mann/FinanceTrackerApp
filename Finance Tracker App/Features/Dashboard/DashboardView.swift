@@ -8,38 +8,29 @@ import SwiftUI
 
 struct DashboardView: View {
     
-    @StateObject private var viewModel: DashboardViewModel
-    
-    init(container: DIContainer) {
-        _viewModel = StateObject(
-            wrappedValue: DashboardViewModel(
-                apiClient: container.apiClient
-            )
-        )
-    }
+    let container: DIContainer
     
     var body: some View {
         
-        NavigationView {
+        NavigationStack {
             
-            Group {
+            VStack(spacing: 20) {
                 
-                if viewModel.isLoading {
-                    ProgressView()
-                    
-                } else if let error = viewModel.errorMessage {
-                    Text(error)
-                    
-                } else {
-                    List(viewModel.products) { product in
-                        Text(product.title)
-                    }
+                Text("Finance Tracker")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                
+                NavigationLink {
+                    TransactionsView()
+                } label: {
+                    Text("Go To Transactions")
+                        .padding()
+                        .frame(maxWidth: .infinity)
                 }
+                .buttonStyle(.borderedProminent)
             }
+            .padding()
             .navigationTitle("Dashboard")
-        }
-        .task {
-            await viewModel.fetchProducts()
         }
     }
 }

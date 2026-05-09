@@ -6,16 +6,13 @@
 //
 
 import Foundation
+import Combine
 
-final class DIContainer {
+final class DIContainer: ObservableObject {
     
-    // MARK: - Services
     let apiClient: APIClient
-    let persistenceService: PersistenceService
     
-    // MARK: - Init
     init() {
         self.apiClient = DefaultAPIClient()
-        self.persistenceService = DefaultPersistenceService()
     }
 }
