@@ -6,38 +6,30 @@
 //
 import Foundation
 import Combine
+import Foundation
 
 @MainActor
 final class TransactionsViewModel: ObservableObject {
     
     @Published var transactions: [Transaction] = []
     
-    private let persistenceService: PersistenceService
+    private var persistenceService: PersistenceService?
     
-    init(persistenceService: PersistenceService) {
+    init() {}
+    
+    func configure(
+        persistenceService: PersistenceService
+    ) {
         self.persistenceService = persistenceService
     }
     
     func loadTransactions() {
         
-        do {
-            transactions = try persistenceService.fetchTransactions()
-        } catch {
-            print(error.localizedDescription)
-        }
-    }
-    
-    func addDummyTransaction() {
+        guard let persistenceService else { return }
         
         do {
-            
-            try persistenceService.saveTransaction(
-                title: "Coffee",
-                amount: 250,
-                category: "Food"
-            )
-            
-            loadTransactions()
+            transactions =
+            try persistenceService.fetchTransactions()
             
         } catch {
             print(error.localizedDescription)
@@ -46,13 +38,17 @@ final class TransactionsViewModel: ObservableObject {
     
     func deleteTransaction(at offsets: IndexSet) {
         
+        guard let persistenceService else { return }
+        
         do {
             
             for index in offsets {
                 
                 let transaction = transactions[index]
                 
-                try persistenceService.deleteTransaction(transaction)
+                try persistenceService.deleteTransaction(
+                    transaction
+                )
             }
             
             loadTransactions()

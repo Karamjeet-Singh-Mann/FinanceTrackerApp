@@ -7,82 +7,76 @@
 import SwiftUI
 import SwiftData
 import Combine
-import SwiftUI
-import SwiftData
+
 
 struct TransactionsView: View {
     
     @Environment(\.modelContext)
     private var modelContext
     
-    @State private var viewModel: TransactionsViewModel?
+    @StateObject
+    private var viewModel = TransactionsViewModel()
+    
+    @State private var showAddExpense = false
     
     var body: some View {
         
-        Group {
+        List {
             
-            if let viewModel {
+            ForEach(viewModel.transactions) { transaction in
                 
-                content(viewModel)
-                
-            } else {
-                
-                ProgressView()
-                    .onAppear {
-                        setupViewModel()
-                    }
-            }
-        }
-    }
-    
-    @ViewBuilder
-    private func content(
-        _ viewModel: TransactionsViewModel
-    ) -> some View {
-        
-        VStack {
-            
-            Button("Add Dummy Transaction") {
-                viewModel.addDummyTransaction()
-            }
-            .padding()
-            
-            List {
-                
-                ForEach(viewModel.transactions) { transaction in
+                VStack(alignment: .leading) {
                     
-                    VStack(alignment: .leading) {
-                        
-                        Text(transaction.title)
-                            .font(.headline)
-                        
-                        Text(transaction.category)
-                        
-                        Text("₹\(transaction.amount)")
-                    }
+                    Text(transaction.title)
+                        .font(.headline)
+                    
+                    Text(transaction.category)
+                    
+                    Text("₹\(String(format: "%.2f", transaction.amount))")
                 }
-                .onDelete(
-                    perform: viewModel.deleteTransaction
-                )
             }
+            .onDelete(
+                perform: viewModel.deleteTransaction
+            )
         }
         .navigationTitle("Transactions")
-        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            
+            ToolbarItem(
+                placement: .topBarTrailing
+            ) {
+                
+                Button {
+                    showAddExpense = true
+                } label: {
+                    Image(systemName: "plus")
+                }
+            }
+        }
+        .sheet(
+            isPresented: $showAddExpense,
+            onDismiss: {
+                viewModel.loadTransactions()
+            }
+        ) {
+            AddExpenseView()
+        }
+        .onAppear {
+            setupViewModel()
+        }
     }
     
     private func setupViewModel() {
         
-        let persistenceService =
+        let service =
         SwiftDataPersistenceService(
             modelContext: modelContext
         )
         
-        let vm = TransactionsViewModel(
-            persistenceService: persistenceService
+        viewModel.configure(
+            persistenceService: service
         )
         
-        vm.loadTransactions()
-        
-        self.viewModel = vm
+        viewModel.loadTransactions()
     }
 }
