@@ -6,38 +6,54 @@
 //
 import Foundation
 import Combine
+import Foundation
 
 @MainActor
 final class DashboardViewModel: ObservableObject {
     
-    @Published var products: [Product] = []
-    @Published var isLoading = false
-    @Published var errorMessage: String?
+    @Published var transactions: [Transaction] = []
     
-    private let apiClient: APIClient
+    private var persistenceService: PersistenceService?
     
-    init(apiClient: APIClient) {
-        self.apiClient = apiClient
+    init() {}
+    
+    func configure(
+        persistenceService: PersistenceService
+    ) {
+        self.persistenceService = persistenceService
     }
     
-    func fetchProducts() async {
+    func loadDashboardData() {
         
-        isLoading = true
-        
-        defer {
-            isLoading = false
-        }
+        guard let persistenceService else { return }
         
         do {
-            let endpoint = Endpoint(path: "/products")
             
-            let response: ProductsResponse =
-                try await apiClient.request(endpoint)
-            
-            self.products = response.products
+            transactions =
+            try persistenceService.fetchTransactions()
             
         } catch {
-            self.errorMessage = error.localizedDescription
+            print(error.localizedDescription)
         }
+    }
+}
+
+    // MARK: - Analytics
+
+extension DashboardViewModel {
+    
+    var totalExpenses: Double {
+        
+        transactions.reduce(0) {
+            $0 + $1.amount
+        }
+    }
+    
+    var totalTransactions: Int {
+        transactions.count
+    }
+    
+    var recentTransactions: [Transaction] {
+        Array(transactions.prefix(5))
     }
 }

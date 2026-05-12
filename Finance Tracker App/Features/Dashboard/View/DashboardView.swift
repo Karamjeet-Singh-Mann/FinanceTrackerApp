@@ -5,10 +5,17 @@
 //  Created by Karamjeet singh on 30/04/26.
 //
 import SwiftUI
+import SwiftData
 
 struct DashboardView: View {
     
     let container: DIContainer
+    
+    @Environment(\.modelContext)
+    private var modelContext
+    
+    @StateObject
+    private var viewModel = DashboardViewModel()
     
     var body: some View {
         
@@ -27,15 +34,39 @@ struct DashboardView: View {
                     
                     statsSection
                     
+                    recentTransactionsSection
+                    
                     actionsSection
                 }
                 .padding()
             }
-            .navigationBarTitleDisplayMode(.inline)
             .background(
                 Color(.systemGroupedBackground)
             )
+            .navigationBarTitleDisplayMode(.inline)
+            .onAppear {
+                setupViewModel()
+            }
         }
+    }
+}
+
+    // MARK: - Setup
+
+private extension DashboardView {
+    
+    func setupViewModel() {
+        
+        let service =
+        SwiftDataPersistenceService(
+            modelContext: modelContext
+        )
+        
+        viewModel.configure(
+            persistenceService: service
+        )
+        
+        viewModel.loadDashboardData()
     }
 }
 
@@ -57,7 +88,6 @@ private extension DashboardView {
             Text("Finance Tracker")
                 .font(.largeTitle.bold())
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
     
     var balanceCard: some View {
@@ -67,37 +97,27 @@ private extension DashboardView {
             spacing: 16
         ) {
             
-            Text("Total Balance")
-                .foregroundStyle(.secondary)
+            Text("Total Expenses")
+                .foregroundStyle(.white.opacity(0.8))
             
-            Text("₹24,500")
-                .font(.system(size: 40, weight: .bold))
+            Text(
+                "₹\(viewModel.totalExpenses, specifier: "%.0f")"
+            )
+            .font(
+                .system(size: 40, weight: .bold)
+            )
             
-            HStack {
-                
-                Label(
-                    "Income +12%",
-                    systemImage: "arrow.up.right"
-                )
-                .font(.subheadline)
-                .foregroundStyle(.green)
-                
-                Spacer()
-                
-                Label(
-                    "Expenses -8%",
-                    systemImage: "arrow.down.right"
-                )
-                .font(.subheadline)
-                .foregroundStyle(.red)
-            }
+            Text(
+                "\(viewModel.totalTransactions) Transactions"
+            )
+            .foregroundStyle(.white.opacity(0.8))
         }
         .padding()
         .frame(maxWidth: .infinity)
         .background(.blue.gradient)
         .foregroundStyle(.white)
         .clipShape(
-            RoundedRectangle(cornerRadius: 24)
+            RoundedRectangle(cornerRadius: 28)
         )
     }
     
@@ -113,14 +133,14 @@ private extension DashboardView {
             
             HStack(spacing: 16) {
                 
-                statCard(
+                DashboardStatCard(
                     title: "Transactions",
-                    value: "24",
+                    value: "\(viewModel.totalTransactions)",
                     icon: "creditcard.fill",
                     color: .orange
                 )
                 
-                statCard(
+                DashboardStatCard(
                     title: "Categories",
                     value: "6",
                     icon: "square.grid.2x2.fill",
@@ -130,34 +150,47 @@ private extension DashboardView {
         }
     }
     
-    func statCard(
-        title: String,
-        value: String,
-        icon: String,
-        color: Color
-    ) -> some View {
+    var recentTransactionsSection: some View {
         
         VStack(
             alignment: .leading,
-            spacing: 12
+            spacing: 16
         ) {
             
-            Image(systemName: icon)
-                .font(.title2)
-                .foregroundStyle(color)
+            HStack {
+                
+                Text("Recent Transactions")
+                    .font(.title2.bold())
+                
+                Spacer()
+                
+                NavigationLink("See All") {
+                    TransactionsView()
+                }
+            }
             
-            Text(value)
-                .font(.title.bold())
-            
-            Text(title)
-                .foregroundStyle(.secondary)
+            if viewModel.recentTransactions.isEmpty {
+                
+                ContentUnavailableView(
+                    "No Transactions",
+                    systemImage: "tray"
+                )
+                
+            } else {
+                
+                VStack(spacing: 12) {
+                    
+                    ForEach(
+                        viewModel.recentTransactions
+                    ) { transaction in
+                        
+                        RecentTransactionRow(
+                            transaction: transaction
+                        )
+                    }
+                }
+            }
         }
-        .padding()
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(.background)
-        .clipShape(
-            RoundedRectangle(cornerRadius: 20)
-        )
     }
     
     var actionsSection: some View {
@@ -176,8 +209,10 @@ private extension DashboardView {
                 
                 HStack {
                     
-                    Image(systemName: "list.bullet.rectangle")
-                        .font(.title3)
+                    Image(
+                        systemName:
+                            "list.bullet.rectangle"
+                    )
                     
                     Text("View Transactions")
                         .fontWeight(.semibold)
