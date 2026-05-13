@@ -34,6 +34,10 @@ struct DashboardView: View {
                     
                     statsSection
                     
+                    analyticsSection
+                    
+                    insightCard
+                    
                     recentTransactionsSection
                     
                     actionsSection
@@ -148,6 +152,36 @@ private extension DashboardView {
                 )
             }
         }
+    }
+    
+    var analyticsSection: some View {
+        
+        ExpenseChartView(
+            data: viewModel.categoryExpenses
+        )
+    }
+    
+    var insightCard: some View {
+        
+        VStack(
+            alignment: .leading,
+            spacing: 12
+        ) {
+            
+            Text("Monthly Insight")
+                .font(.headline)
+            
+            Text(
+                "Your highest spending category is \(viewModel.categoryExpenses.first?.category ?? "N/A")."
+            )
+            .foregroundStyle(.secondary)
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.background)
+        .clipShape(
+            RoundedRectangle(cornerRadius: 20)
+        )
     }
     
     var recentTransactionsSection: some View {

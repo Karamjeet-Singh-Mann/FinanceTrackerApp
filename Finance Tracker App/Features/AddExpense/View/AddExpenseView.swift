@@ -15,32 +15,10 @@ struct AddExpenseView: View {
     @Environment(\.modelContext)
     private var modelContext
     
-    @State private var viewModel:
-    AddExpenseViewModel?
-    
+    @StateObject
+    private var viewModel = AddExpenseViewModel()
     
     var body: some View {
-        
-        Group {
-            
-            if let viewModel {
-                
-                content(viewModel)
-                
-            } else {
-                
-                ProgressView()
-                    .onAppear {
-                        setupViewModel()
-                    }
-            }
-        }
-    }
-    
-    @ViewBuilder
-    private func content(
-        _ viewModel: AddExpenseViewModel
-    ) -> some View {
         
         NavigationStack {
             
@@ -50,18 +28,12 @@ struct AddExpenseView: View {
                     
                     ExpenseTextField(
                         title: "Title",
-                        text: Binding(
-                            get: { viewModel.title },
-                            set: { viewModel.title = $0 }
-                        )
+                        text: $viewModel.title
                     )
                     
                     ExpenseTextField(
                         title: "Amount",
-                        text: Binding(
-                            get: { viewModel.amount },
-                            set: { viewModel.amount = $0 }
-                        ),
+                        text: $viewModel.amount,
                         keyboardType: .decimalPad
                     )
                 }
@@ -70,10 +42,7 @@ struct AddExpenseView: View {
                     
                     Picker(
                         "Category",
-                        selection: Binding(
-                            get: { viewModel.category },
-                            set: { viewModel.category = $0 }
-                        )
+                        selection: $viewModel.category
                     ) {
                         
                         ForEach(
@@ -82,8 +51,10 @@ struct AddExpenseView: View {
                         ) { category in
                             
                             Text(category)
+                                .tag(category)
                         }
                     }
+                    .pickerStyle(.menu)
                 }
             }
             .navigationTitle("Add Expense")
@@ -106,14 +77,14 @@ struct AddExpenseView: View {
             }
             .alert(
                 "Error",
-                isPresented: Binding(
-                    get: { viewModel.showError },
-                    set: { viewModel.showError = $0 }
-                )
+                isPresented: $viewModel.showError
             ) {
                 Button("OK") {}
             } message: {
                 Text(viewModel.errorMessage)
+            }
+            .onAppear {
+                setupViewModel()
             }
         }
     }
@@ -125,13 +96,8 @@ struct AddExpenseView: View {
             modelContext: modelContext
         )
         
-        self.viewModel =
-        AddExpenseViewModel(
+        viewModel.configure(
             persistenceService: service
         )
     }
-}
-
-#Preview {
-    AddExpenseView()
 }

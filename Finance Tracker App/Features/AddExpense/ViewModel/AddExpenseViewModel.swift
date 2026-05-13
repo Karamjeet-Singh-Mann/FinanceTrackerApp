@@ -27,9 +27,11 @@ final class AddExpenseViewModel: ObservableObject {
         "Health"
     ]
     
-    private let persistenceService: PersistenceService
+    private var persistenceService: PersistenceService?
     
-    init(
+    init() {}
+    
+    func configure(
         persistenceService: PersistenceService
     ) {
         self.persistenceService = persistenceService
@@ -37,12 +39,17 @@ final class AddExpenseViewModel: ObservableObject {
     
     func saveExpense() -> Bool {
         
+        guard let persistenceService else {
+            return false
+        }
+        
         guard !title.trimmingCharacters(
             in: .whitespaces
         ).isEmpty else {
             
             errorMessage = "Please enter title"
             showError = true
+            
             return false
         }
         
@@ -51,6 +58,7 @@ final class AddExpenseViewModel: ObservableObject {
             
             errorMessage = "Please enter valid amount"
             showError = true
+            
             return false
         }
         

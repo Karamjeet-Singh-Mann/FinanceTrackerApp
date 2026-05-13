@@ -57,3 +57,30 @@ extension DashboardViewModel {
         Array(transactions.prefix(5))
     }
 }
+
+extension DashboardViewModel {
+    
+    var categoryExpenses: [CategoryExpense] {
+        
+        let grouped = Dictionary(
+            grouping: transactions
+        ) {
+            $0.category
+        }
+        
+        return grouped.map { category, items in
+            
+            let total = items.reduce(0) {
+                $0 + $1.amount
+            }
+            
+            return CategoryExpense(
+                category: category,
+                total: total
+            )
+        }
+        .sorted {
+            $0.total > $1.total
+        }
+    }
+}
