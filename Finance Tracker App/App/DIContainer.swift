@@ -11,8 +11,14 @@ import Combine
 final class DIContainer: ObservableObject {
     
     let apiClient: APIClient
+    let aiService: AIService
     
     init() {
-        self.apiClient = DefaultAPIClient()
+        
+        self.apiClient =
+        DefaultAPIClient()
+        
+        self.aiService =
+        DefaultAIService()
     }
 }

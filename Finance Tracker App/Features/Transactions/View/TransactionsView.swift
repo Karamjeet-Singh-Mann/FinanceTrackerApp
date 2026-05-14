@@ -59,7 +59,9 @@ struct TransactionsView: View {
                 viewModel.loadTransactions()
             }
         ) {
-            AddExpenseView()
+            AddExpenseView(
+                container: DIContainer()
+            )
         }
         .onAppear {
             setupViewModel()

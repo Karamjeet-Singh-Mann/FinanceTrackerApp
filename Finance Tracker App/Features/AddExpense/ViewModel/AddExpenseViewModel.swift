@@ -28,13 +28,32 @@ final class AddExpenseViewModel: ObservableObject {
     ]
     
     private var persistenceService: PersistenceService?
+    private var aiService: AIService?
     
     init() {}
     
     func configure(
-        persistenceService: PersistenceService
+        persistenceService: PersistenceService,
+        aiService: AIService
     ) {
-        self.persistenceService = persistenceService
+        self.persistenceService =
+        persistenceService
+        
+        self.aiService = aiService
+    }
+    
+    func autoCategorize() {
+        
+        guard let aiService else { return }
+        
+        guard !title.isEmpty else { return }
+        
+        let suggestion =
+        aiService.suggestCategory(
+            for: title
+        )
+        
+        category = suggestion
     }
     
     func saveExpense() -> Bool {

@@ -17,6 +17,8 @@ struct AddExpenseView: View {
     
     @StateObject
     private var viewModel = AddExpenseViewModel()
+    let container: DIContainer
+
     
     var body: some View {
         
@@ -30,6 +32,11 @@ struct AddExpenseView: View {
                         title: "Title",
                         text: $viewModel.title
                     )
+                    
+                    Button("Suggest Category with AI") {
+                        viewModel.autoCategorize()
+                    }
+                    .font(.subheadline)
                     
                     ExpenseTextField(
                         title: "Amount",
@@ -97,7 +104,8 @@ struct AddExpenseView: View {
         )
         
         viewModel.configure(
-            persistenceService: service
+            persistenceService: service,
+            aiService: container.aiService
         )
     }
 }
