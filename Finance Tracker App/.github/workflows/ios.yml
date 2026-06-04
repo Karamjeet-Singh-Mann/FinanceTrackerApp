@@ -1,8 +1,24 @@
-//
-//  ios.yml
-//  Finance Tracker App
-//
-//  Created by Karamjeet singh on 04/06/26.
-//
 
-import Foundation
+name: iOS CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-and-test:
+    
+    runs-on: macos-latest
+    
+    steps:
+    
+      - uses: actions/checkout@v4
+      
+      - name: Select Xcode
+        run: sudo xcode-select -switch /Applications/Xcode.app
+      
+      - name: Run Tests
+        run: |
+          xcodebuild test \
+          -scheme FinanceTracker \
+          -destination 'platform=iOS Simulator,name=iPhone 16'

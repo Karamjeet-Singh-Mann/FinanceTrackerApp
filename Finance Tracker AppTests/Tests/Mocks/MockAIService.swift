@@ -6,3 +6,14 @@
 //
 
 import Foundation
+
+@testable import Finance_Tracker_App
+
+final class MockAIService: AIService {
+    
+    func suggestCategory(
+        for title: String
+    ) -> String {
+        "Food"
+    }
+}
