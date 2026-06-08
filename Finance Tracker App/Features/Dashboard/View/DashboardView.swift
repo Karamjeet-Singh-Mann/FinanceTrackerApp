@@ -18,38 +18,64 @@ struct DashboardView: View {
     private var viewModel = DashboardViewModel()
     
     var body: some View {
-        
-        NavigationStack {
+        if viewModel.isLoading {
+            ProgressView()
+  
+        } else {
             
-            ScrollView {
+            
+            NavigationStack {
                 
-                VStack(
-                    alignment: .leading,
-                    spacing: 24
+                ScrollView {
+                    
+                    VStack(
+                        alignment: .leading,
+                        spacing: 24
+                    ) {
+                        
+                        headerSection
+                        
+                        balanceCard
+                        
+                        statsSection
+                        
+                        analyticsSection
+                        
+                        insightCard.accessibilityLabel(
+                            "Spending Analytics"
+                        )
+                        
+                        recentTransactionsSection
+                        
+                        actionsSection
+                    }
+                    .padding()
+                }
+                .background(
+                    Color(.systemGroupedBackground)
+                )
+                .navigationBarTitleDisplayMode(.inline)
+                .onAppear {
+                    setupViewModel()
+                }.alert(
+                    "Something Went Wrong",
+                    isPresented: .constant(
+                        viewModel.errorMessage != nil
+                    )
                 ) {
                     
-                    headerSection
+                    Button("OK") {
+                        viewModel.errorMessage = nil
+                    }
                     
-                    balanceCard
+                } message: {
                     
-                    statsSection
-                    
-                    analyticsSection
-                    
-                    insightCard
-                    
-                    recentTransactionsSection
-                    
-                    actionsSection
+                    Text(
+                        viewModel.errorMessage ?? ""
+                    )
                 }
-                .padding()
-            }
-            .background(
-                Color(.systemGroupedBackground)
-            )
-            .navigationBarTitleDisplayMode(.inline)
-            .onAppear {
-                setupViewModel()
+            }.refreshable {
+                viewModel.loadDashboardData()
             }
         }
     }

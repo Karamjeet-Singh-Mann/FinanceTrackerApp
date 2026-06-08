@@ -12,6 +12,8 @@ import Foundation
 final class DashboardViewModel: ObservableObject {
     
     @Published var transactions: [Transaction] = []
+    @Published var isLoading = false
+    @Published var errorMessage: String?
     
     private var persistenceService: PersistenceService?
     
@@ -24,6 +26,12 @@ final class DashboardViewModel: ObservableObject {
     }
     
     func loadDashboardData() {
+            
+        isLoading = true
+        
+        defer {
+            isLoading = false
+        }
         
         guard let persistenceService else { return }
         
@@ -33,7 +41,7 @@ final class DashboardViewModel: ObservableObject {
             try persistenceService.fetchTransactions()
             
         } catch {
-            print(error.localizedDescription)
+            errorMessage = error.localizedDescription
         }
     }
 }

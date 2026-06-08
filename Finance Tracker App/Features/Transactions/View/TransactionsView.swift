@@ -20,52 +20,71 @@ struct TransactionsView: View {
     @State private var showAddExpense = false
     
     var body: some View {
-        
-        List {
+        if viewModel.transactions.isEmpty {
             
-            ForEach(viewModel.transactions) { transaction in
-                
-                VStack(alignment: .leading) {
-                    
-                    Text(transaction.title)
-                        .font(.headline)
-                    
-                    Text(transaction.category)
-                    
-                    Text("₹\(String(format: "%.2f", transaction.amount))")
-                }
+            EmptyStateView(
+                title: "No Expenses Yet",
+                message: "Add your first expense to get started.",
+                systemImage: "tray"
+            ).onAppear {
+                setupViewModel()
             }
-            .onDelete(
-                perform: viewModel.deleteTransaction
-            )
-        }
-        .navigationTitle("Transactions")
-        .toolbar {
             
-            ToolbarItem(
-                placement: .topBarTrailing
-            ) {
+        } else {
+            
+            List {
                 
-                Button {
-                    showAddExpense = true
-                } label: {
-                    Image(systemName: "plus")
+                ForEach(viewModel.transactions) { transaction in
+                    
+                    VStack(alignment: .leading) {
+                        
+                        Text(transaction.title)
+                            .font(.headline)
+                        
+                        Text(transaction.category)
+                        
+                        Text("₹\(String(format: "%.2f", transaction.amount))")
+                    }.accessibilityElement(
+                        children: .combine
+                    )
                 }
-            }
-        }
-        .sheet(
-            isPresented: $showAddExpense,
-            onDismiss: {
+                .onDelete(
+                    perform: viewModel.deleteTransaction
+                )
+            }.refreshable {
                 viewModel.loadTransactions()
             }
-        ) {
-            AddExpenseView(
-                container: DIContainer()
-            )
+            .navigationTitle("Transactions")
+                .toolbar {
+                    
+                    ToolbarItem(
+                        placement: .topBarTrailing
+                    ) {
+                        
+                        Button {
+                            showAddExpense = true
+                        } label: {
+                            Image(systemName: "plus")
+                        }.accessibilityLabel(
+                            "Add Expense"
+                        )
+
+                    }
+                }
+                .sheet(
+                    isPresented: $showAddExpense,
+                    onDismiss: {
+                        viewModel.loadTransactions()
+                    }
+                ) {
+                    AddExpenseView(
+                        container: DIContainer()
+                    )
+                }
         }
-        .onAppear {
-            setupViewModel()
-        }
+
+        
+      
     }
     
     private func setupViewModel() {
